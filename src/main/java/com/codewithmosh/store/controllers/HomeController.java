@@ -10,10 +10,5 @@ public class HomeController {
     public String index(Model model){ //model is a container for data, we use it to pass data from a controller to a view
         model.addAttribute("name", "Angie");
         return "index"; //removed html because we are now working with a thymeleaf template
-    }  
-    
-    @RequestMapping("/hello")
-    public String sayHello(){
-        return "index.html";
     }   
 }
