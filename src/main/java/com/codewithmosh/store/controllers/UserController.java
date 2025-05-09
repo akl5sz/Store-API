@@ -7,11 +7,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.codewithmosh.store.dtos.RegisterUserRequest;
 import com.codewithmosh.store.dtos.UserDto;
 import com.codewithmosh.store.entities.User;
 import com.codewithmosh.store.mappers.UserMapper;
@@ -27,9 +31,7 @@ public class UserController {
     private final UserMapper userMapper;
     
     @GetMapping
-    public Iterable<UserDto> getAllUsers(@RequestHeader(required = false, name="x-auth-token") String authToken, //header is not case sensitive
-        @RequestParam(required = false, defaultValue = "", name = "sort") String sort){ 
-        System.out.println(authToken);
+    public Iterable<UserDto> getAllUsers(@RequestParam(required = false, defaultValue = "", name = "sort") String sort){ 
         if(!Set.of("name", "email").contains(sort)){
             sort = "name";
         }
@@ -46,5 +48,16 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(userMapper.toDto(user));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest request,
+        UriComponentsBuilder uriBuilder){
+        User user = userMapper.toEntity(request);
+        userRepository.save(user);
+
+        UserDto userDto = userMapper.toDto(user);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(userDto);
     }
 }
