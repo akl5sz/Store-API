@@ -1,12 +1,16 @@
 package com.codewithmosh.store.dtos;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class UserDto {   
+public class ProductDto {
     private Long id;
     private String name;
-    private String email;
+    private String description;
+    private BigDecimal price;
+    private Byte categoryId;
 }
