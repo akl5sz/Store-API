@@ -3,6 +3,7 @@ package com.codewithmosh.store.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -84,5 +85,15 @@ public class ProductController {
         productRepository.save(product);
         productDto.setId(id);
         return ResponseEntity.ok(productDto);   
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id){
+        Product product = productRepository.findById(id).orElse(null);
+        if(product == null){
+            return ResponseEntity.notFound().build();
+        }
+        productRepository.delete(product);
+        return ResponseEntity.noContent().build();
     }
 }
