@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,5 +67,22 @@ public class ProductController {
         productDto.setId(product.getId());
         var uri = uriBuilder.path("/products/{id}").buildAndExpand(product.getId()).toUri(); //returns uri that the new resource belongs to
         return ResponseEntity.created(uri).body(productDto);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable(name = "id") Long id,
+    @RequestBody ProductDto productDto){
+        Category category = categoryRepository.findById(productDto.getCategoryId()).orElse(null);
+        if(category == null){
+            return ResponseEntity.badRequest().build();
+        }Product product = productRepository.findById(id).orElse(null);
+        if(product == null){
+            return ResponseEntity.notFound().build();
+        }  
+        productMapper.update(productDto, product);
+        product.setCategory(category);
+        productRepository.save(product);
+        productDto.setId(id);
+        return ResponseEntity.ok(productDto);   
     }
 }
